@@ -12,14 +12,14 @@ public class Calculator extends JFrame {
         showCenter(); // 중앙 버튼 패널 추가
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(300, 350);
+        setSize(300, 400); // 높이 조정
         setVisible(true);
     }
 
     // 북쪽 패널에 JTextArea 추가
     void showNorth() {
         JPanel panel = new JPanel();
-        JTextArea area = new JTextArea(3, 20);
+        JTextArea area = new JTextArea(4, 24);
         area.setEditable(false);  // 수정 불가
         area.setLineWrap(true);   // 텍스트 줄 바꿈 허용
         area.setWrapStyleWord(true);  // 단어 단위로 줄 바꿈
@@ -34,17 +34,35 @@ public class Calculator extends JFrame {
     // 중앙에 버튼 패널 추가
     void showCenter() {
         JPanel buttonPanel = new JPanel(new GridLayout(5, 4));  // 5x4 그리드 레이아웃 설정
+
         String[] buttons = {
                 "C", "+/-", "%", "/",
                 "7", "8", "9", "x",
                 "4", "5", "6", "-",
                 "1", "2", "3", "+",
-                "0", "0", ".", "="
+                "0", ".", "=" // 0과 . 각각 한 칸 차지
         };
 
+        // 버튼 추가
         for (String text : buttons) {
             buttonPanel.add(new JButton(text));  // 버튼 패널에 추가
         }
+
+        // JComboBox 추가
+        String[] calculatorTypes = { "기본 계산기", "공학용 계산기", "프로그래머용 계산기" };
+        JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
+
+        // JComboBox 크기 조정
+        comboBox.setPreferredSize(new Dimension(80, 30)); // 버튼과 비슷한 크기로 설정
+
+        comboBox.addActionListener(e -> {
+            String selected = (String) comboBox.getSelectedItem();
+            // 선택된 계산기 유형에 대한 처리 로직 추가
+            System.out.println("선택된 계산기: " + selected);
+        });
+
+        // 버튼 패널에 JComboBox 추가
+        buttonPanel.add(comboBox); // 마지막 칸에 추가
 
         add(buttonPanel, BorderLayout.CENTER); // 중앙에 버튼 패널 추가
     }
