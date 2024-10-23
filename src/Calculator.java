@@ -1,8 +1,14 @@
 import javax.swing.*;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Calculator extends JFrame {
-
+    private JTextArea area;
+    private StringBuilder currentInput = new StringBuilder();
+    private double result = 0;
+    private String operator = "";
     // 생성자 정의
     public Calculator() {
         setTitle("Calculator");
@@ -19,7 +25,7 @@ public class Calculator extends JFrame {
     // 북쪽 패널에 JTextArea 추가
     void showNorth() {
         JPanel panel = new JPanel();
-        JTextArea area = new JTextArea(4, 24);
+        area = new JTextArea(4, 20);
         area.setEditable(false);  // 수정 불가
         area.setLineWrap(true);   // 텍스트 줄 바꿈 허용
         area.setWrapStyleWord(true);  // 단어 단위로 줄 바꿈
@@ -45,7 +51,11 @@ public class Calculator extends JFrame {
 
         // 버튼 추가
         for (String text : buttons) {
-            buttonPanel.add(new JButton(text));  // 버튼 패널에 추가
+            JButton button = new JButton(text); //버튼 생성
+
+            button.addActionListener(new ButtonClickListener());
+            buttonPanel.add(button);
+
         }
 
         // JComboBox 추가
@@ -72,6 +82,71 @@ public class Calculator extends JFrame {
         buttonPanel.add(comboBox); // 마지막 칸에 추가
 
         add(buttonPanel, BorderLayout.CENTER); // 중앙에 버튼 패널 추가
+    }
+    //버튼 클릭 리스너(기본 계산기)
+    private class ButtonClickListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
+
+            switch (command){
+                case "C":
+                    currentInput.setLength(0);
+                    result = 0;
+                    operator="";
+                    area.setText("0");
+                    break;
+                case "=":
+                    calculate();
+                    break;
+                case "+":
+                case "-":
+                case "x":
+                case "/":
+                    if (currentInput.length() > 0) {
+                        operator = command.equals("x") ? "*" : command; // 'x'를 '*'로 변환
+                        result = Double.parseDouble(currentInput.toString());
+                        area.append(result + " " + operator + " "); // 계산 과정 표시
+                        currentInput.setLength(0); // 입력 초기화
+                    }
+                    break;
+                default:
+                    currentInput.append(command); // 버튼 텍스트를 입력에 추가
+                    area.setText(currentInput.toString()); // 현재 입력 표시
+                    break;
+            }
+        }
+    }
+    // 계산 로직
+    private void calculate() {
+        if (operator.isEmpty() || currentInput.length() == 0) return;
+
+        double value = Double.parseDouble(currentInput.toString());
+
+        switch (operator) {
+            case "+":
+                result += value;
+                break;
+            case "-":
+                result -= value;
+                break;
+            case "*":
+                result *= value;
+                break;
+            case "/":
+                if (value != 0) {
+                    result /= value;
+                } else {
+                    area.setText("Error");
+                    currentInput.setLength(0);
+                    return;
+                }
+                break;
+            default:
+                break;
+        }
+        area.append(value + " = " + result + "\n"); //최종결과 표시
+        currentInput.setLength(0); //입력 초기화
+        operator = ""; //연산자 초기화
     }
 
     // 메인 메서드
