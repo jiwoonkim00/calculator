@@ -58,6 +58,13 @@ public class Calculator extends JFrame {
         comboBox.addActionListener(e -> {
             String selected = (String) comboBox.getSelectedItem();
             // 선택된 계산기 유형에 대한 처리 로직 추가
+            if (selected.equals("공학용 계산기")) {
+                new ScientificCalculator(); // 공학용 계산기 인스턴스 생성
+                dispose(); // 기본 계산기 창 닫기
+            } else if (selected.equals("프로그래머용 계산기")) {
+                new ProgrammerCalculator(); // 프로그래머용 계산기 인스턴스 생성
+                dispose(); // 기본 계산기 창 닫기
+            }
             System.out.println("선택된 계산기: " + selected);
         });
 
@@ -70,5 +77,123 @@ public class Calculator extends JFrame {
     // 메인 메서드
     public static void main(String[] args) {
         new Calculator();  // Calculator 객체 생성
+    }
+}
+
+// 공학용 계산기 클래스
+class ScientificCalculator extends JFrame {
+
+    public ScientificCalculator() {
+        setTitle("공학용 계산기");
+        setLayout(new BorderLayout());
+
+        // JTextArea 추가
+        JTextArea area = new JTextArea(4, 24);
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(area);
+        add(scrollPane, BorderLayout.NORTH);
+
+        // 버튼 패널 추가
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
+        String[] buttons = {
+                "C", "+/-", "%", "/",
+                "7", "8", "9", "x",
+                "4", "5", "6", "-",
+                "1", "2", "3", "+",
+                "0", ".", "=",
+                "sin", "cos", "tan"  // 추가 버튼
+        };
+
+        for (String text : buttons) {
+            buttonPanel.add(new JButton(text));  // 버튼 패널에 추가
+        }
+
+        // JComboBox 추가
+        String[] calculatorTypes = { "기본 계산기", "프로그래머용 계산기", "공학용 계산기" };
+        JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
+
+        comboBox.addActionListener(e -> {
+            String selected = (String) comboBox.getSelectedItem();
+            // 선택된 계산기 유형에 대한 처리 로직 추가
+            if (selected.equals("기본 계산기")) {
+                new Calculator(); // 기본 계산기 인스턴스 생성
+                dispose(); // 공학용 계산기 창 닫기
+            } else if (selected.equals("프로그래머용 계산기")) {
+                new ProgrammerCalculator(); // 프로그래머용 계산기 인스턴스 생성
+                dispose(); // 공학용 계산기 창 닫기
+            }
+            System.out.println("선택된 계산기: " + selected);
+        });
+
+        // 버튼 패널에 JComboBox 추가
+        buttonPanel.add(comboBox); // 마지막 칸에 추가
+
+        add(buttonPanel, BorderLayout.CENTER);
+
+        setSize(300, 400);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+}
+
+// 프로그래머용 계산기 클래스
+class ProgrammerCalculator extends JFrame {
+
+    public ProgrammerCalculator() {
+        setTitle("프로그래머용 계산기");
+        setLayout(new BorderLayout());
+
+        // JTextArea 추가
+        JTextArea area = new JTextArea(4, 24);
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(area);
+        add(scrollPane, BorderLayout.NORTH);
+
+        // 버튼 패널 추가
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
+        String[] buttons = {
+                "C", "+/-", "%", "/",
+                "7", "8", "9", "x",
+                "4", "5", "6", "-",
+                "1", "2", "3", "+",
+                "0", ".", "=",
+                "AND", "OR", "XOR", "NOT"  // 비트 연산 추가
+        };
+
+        for (String text : buttons) {
+            buttonPanel.add(new JButton(text));  // 버튼 패널에 추가
+        }
+
+        // JComboBox 추가
+        String[] calculatorTypes = { "기본 계산기", "공학용 계산기", "프로그래머용 계산기" };
+        JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
+
+        comboBox.addActionListener(e -> {
+            String selected = (String) comboBox.getSelectedItem();
+            // 선택된 계산기 유형에 대한 처리 로직 추가
+            if (selected.equals("기본 계산기")) {
+                new Calculator(); // 기본 계산기 인스턴스 생성
+                dispose(); // 프로그래머용 계산기 창 닫기
+            } else if (selected.equals("공학용 계산기")) {
+                new ScientificCalculator(); // 공학용 계산기 인스턴스 생성
+                dispose(); // 프로그래머용 계산기 창 닫기
+            }
+            System.out.println("선택된 계산기: " + selected);
+        });
+
+        // 버튼 패널에 JComboBox 추가
+        buttonPanel.add(comboBox); // 마지막 칸에 추가
+
+        add(buttonPanel, BorderLayout.CENTER);
+
+        setSize(300, 400);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
