@@ -192,7 +192,7 @@ class ScientificCalculator extends JFrame {
         });
 
         comboPanel.add(comboBox);
-        add(comboPannel, BorderLayout.SOUTH);
+        add(comboPanel, BorderLayout.SOUTH);
     }
 }
 
