@@ -223,15 +223,16 @@ class ProgrammerCalculator extends JFrame {
             buttonPanel.add(new JButton(text));
         }
 
-        addComboBox(buttonPanel);
         add(buttonPanel, BorderLayout.CENTER);
+        showSouth();
 
         setSize(300, 400);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void addComboBox(JPanel panel) {
+    void showSouth() {
+        JPanel comboPanel = new JPanel();
         String[] calculatorTypes = {"기본 계산기", "공학용 계산기", "프로그래머용 계산기"};
         JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
 
@@ -249,6 +250,7 @@ class ProgrammerCalculator extends JFrame {
             }
         });
 
-        panel.add(comboBox);
+        comboPanel.add(comboBox);
+        add(comboPanel, BorderLayout.SOUTH);
     }
 }
