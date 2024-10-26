@@ -36,6 +36,7 @@ public class Calculator extends JFrame {
     }
 
     void showCenter() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
 
         String[] buttons = {
