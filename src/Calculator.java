@@ -24,7 +24,7 @@ public class Calculator extends JFrame {
 
     void showNorth() {
         JPanel panel = new JPanel();
-        area = new JTextArea(4, 20);
+        area = new JTextArea(4, 24);
         area.setEditable(false);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
@@ -163,16 +163,18 @@ class ScientificCalculator extends JFrame {
             buttonPanel.add(new JButton(text));
         }
 
-        addComboBox(buttonPanel);
+
         add(buttonPanel, BorderLayout.CENTER);
+        showSouth();
 
         setSize(300, 400);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void addComboBox(JPanel panel) {
-        String[] calculatorTypes = {"기본 계산기", "프로그래머용 계산기", "공학용 계산기"};
+    void showSouth() {
+        JPanel comboPanel = new JPanel();
+        String[] calculatorTypes = {"기본 계산기", "공학용 계산기", "프로그래머용 계산기"};
         JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
 
         comboBox.addActionListener(e -> {
@@ -189,7 +191,8 @@ class ScientificCalculator extends JFrame {
             }
         });
 
-        panel.add(comboBox);
+        comboPanel.add(comboBox);
+        add(comboPannel, BorderLayout.SOUTH);
     }
 }
 
