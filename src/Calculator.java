@@ -22,6 +22,8 @@ public class Calculator extends JFrame {
         setVisible(true);
     }
 
+
+
     void showNorth() {
         JPanel panel = new JPanel();
         area = new JTextArea(4, 24);
@@ -116,6 +118,7 @@ public class Calculator extends JFrame {
             case "+" -> result += value;
             case "-" -> result -= value;
             case "*" -> result *= value;
+            case "+/-" -> result = -value;
             case "/" -> {
                 if (value != 0) {
                     result /= value;
@@ -149,7 +152,7 @@ class ScientificCalculator extends JFrame {
         JScrollPane scrollPane = new JScrollPane(area);
         add(scrollPane, BorderLayout.NORTH);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
+        JPanel buttonPanel = new JPanel(new GridLayout(6, 4));
         String[] buttons = {
                 "C", "+/-", "%", "/",
                 "7", "8", "9", "x",
@@ -209,7 +212,7 @@ class ProgrammerCalculator extends JFrame {
         JScrollPane scrollPane = new JScrollPane(area);
         add(scrollPane, BorderLayout.NORTH);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
+        JPanel buttonPanel = new JPanel(new GridLayout(6, 4));
         String[] buttons = {
                 "C", "+/-", "%", "/",
                 "7", "8", "9", "x",
