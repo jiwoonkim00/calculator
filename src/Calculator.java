@@ -101,6 +101,7 @@ public class Calculator extends JFrame {
                         currentInput.setLength(0);
                     }
                 }
+                case "+/-" -> toggleSign();
                 default -> {
                     currentInput.append(command);
                     area.setText(currentInput.toString());
@@ -108,7 +109,15 @@ public class Calculator extends JFrame {
             }
         }
     }
-
+    private void toggleSign() {
+        if (currentInput.length() > 0) {
+            double value = Double.parseDouble(currentInput.toString());
+            value *= -1;  // 부호 반전
+            currentInput.setLength(0);
+            currentInput.append(value);
+            area.setText(currentInput.toString());
+        }
+    }
     private void calculate() {
         if (operator.isEmpty() || currentInput.isEmpty()) return;
 
