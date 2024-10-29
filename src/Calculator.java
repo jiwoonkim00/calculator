@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicOptionPaneUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +9,7 @@ public class Calculator extends JFrame {
     private StringBuilder currentInput = new StringBuilder();
     private double result = 0;
     private String operator = "";
+    private boolean newNumber = true;
 
     public Calculator() {
         setTitle("Calculator");
@@ -30,6 +32,7 @@ public class Calculator extends JFrame {
         area.setEditable(false);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
+        area.setText("0");
 
         JScrollPane scrollPane = new JScrollPane(area);
         panel.add(scrollPane);
@@ -38,8 +41,8 @@ public class Calculator extends JFrame {
     }
 
     void showCenter() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 4));
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 4,5,5));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         String[] buttons = {
                 "C", "+/-", "%", "/",
@@ -90,9 +93,14 @@ public class Calculator extends JFrame {
                     currentInput.setLength(0);
                     result = 0;
                     operator = "";
+                    newNumber = true;
                     area.setText("0");
                 }
-                case "=" -> calculate();
+                case "=" -> {
+                    if(!currentInput.isEmpty() && !operator.isEmpty()) {
+                        calculate();
+                    }
+                }
                 case "+", "-", "x", "/" -> {
                     if (!currentInput.isEmpty()) {
                         operator = command.equals("x") ? "*" : command;
@@ -102,7 +110,22 @@ public class Calculator extends JFrame {
                     }
                 }
                 case "+/-" -> toggleSign();
+                case "%" -> percent();
+                case "." -> {
+                    if (newNumber) {
+                        currentInput.setLength(0);
+                        currentInput.append("0.");
+                        newNumber = false;
+                    } else if (!currentInput.toString().contains(".")) {
+                        currentInput.append(".");
+                    }
+                    area.setText(currentInput.toString());
+                }
                 default -> {
+                    if (newNumber) {
+                        currentInput.setLength(0);
+                        newNumber = false;
+                    }
                     currentInput.append(command);
                     area.setText(currentInput.toString());
                 }
@@ -111,14 +134,32 @@ public class Calculator extends JFrame {
     }
     private void toggleSign() {
         if (currentInput.length() > 0) {
-            double value = Double.parseDouble(currentInput.toString());
-            value *= -1;  // 부호 반전
-            currentInput.setLength(0);
-            currentInput.append(value);
-            area.setText(currentInput.toString());
+            try {
+                double value = Double.parseDouble(currentInput.toString());
+                value = -value;  // 부호 반전
+                currentInput.setLength(0);
+                currentInput.append(formatNumber(value));  // 정수면 소수점 제거
+                area.setText(currentInput.toString());
+            } catch (NumberFormatException e) {
+                area.setText("Error");
+            }
         }
     }
-    private void calculate() {
+
+    private void percent() {
+        if (currentInput.length() > 0) {
+            try {
+                double value = Double.parseDouble(currentInput.toString());
+                value = value / 100;
+                currentInput.setLength(0);
+                currentInput.append(formatNumber(value));
+                area.setText(currentInput.toString());
+            } catch (NumberFormatException e) {
+                area.setText("Error");
+            }
+        }
+    }
+    private void calculate () {
         if (operator.isEmpty() || currentInput.isEmpty()) return;
 
         double value = Double.parseDouble(currentInput.toString());
@@ -134,35 +175,64 @@ public class Calculator extends JFrame {
                 } else {
                     area.setText("Error");
                     currentInput.setLength(0);
+                    operator = "";
                     return;
                 }
             }
         }
-        area.setText(String.valueOf(result)); // 결과 덮어쓰기
+        area.setText(formatNumber(result)); // 결과 덮어쓰기
         currentInput.setLength(0);
+        currentInput.append(result);
         operator = "";
+        newNumber = true;
     }
+        private String formatNumber(double number) {
+            if (number == (long) number) {
+                return String.format("%d", (long) number);
+            } else {
+                return String.format("%.8g", number);
+            }
+        }
 
-    public static void main(String[] args) {
-        new Calculator();
+
+    public static void main (String[] args) {
+        SwingUtilities.invokeLater(Calculator::new);
     }
 }
 
 class ScientificCalculator extends JFrame {
+    private JTextArea area;
+    private StringBuilder currentInput = new StringBuilder();
+    private double result = 0;
+
     public ScientificCalculator() {
         setTitle("공학용 계산기");
         setLayout(new BorderLayout());
 
-        JTextArea area = new JTextArea(4, 24);
+        showNorth();
+        showCenter();
+        showSouth();
+
+        setSize(300, 400);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    }
+    void showNorth() {
+        JPanel panel = new JPanel();
+        area = new JTextArea(4, 24);
         area.setEditable(false);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
 
         JScrollPane scrollPane = new JScrollPane(area);
-        add(scrollPane, BorderLayout.NORTH);
+        panel.add(scrollPane);
 
+        add(panel, BorderLayout.NORTH);
+    }
+    void showCenter() {
         JPanel buttonPanel = new JPanel(new GridLayout(6, 4));
-        String[] buttons = {
+        String[] bottons = {
                 "C", "+/-", "%", "/",
                 "7", "8", "9", "x",
                 "4", "5", "6", "-",
@@ -171,19 +241,14 @@ class ScientificCalculator extends JFrame {
                 "sin", "cos", "tan"
         };
 
-        for (String text : buttons) {
-            buttonPanel.add(new JButton(text));
+        for (String text : bottons) {
+            JButton button = new JButton(text);
+            button.addActionListener(new ButtonClikListener());
+            buttonPanel.add(button);
         }
 
-
         add(buttonPanel, BorderLayout.CENTER);
-        showSouth();
-
-        setSize(300, 400);
-        setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-
     void showSouth() {
         JPanel comboPanel = new JPanel();
         String[] calculatorTypes = {"기본 계산기", "공학용 계산기", "프로그래머용 계산기"};
@@ -205,8 +270,37 @@ class ScientificCalculator extends JFrame {
 
         comboPanel.add(comboBox);
         add(comboPanel, BorderLayout.SOUTH);
+
+    }
+
+    private class ButtonClickListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
+
+            try {
+                double value = Double.parseDouble(currentInput.toString());
+                switch (command) {
+                    case "sin" -> area.setText(String.valueOf(Math.sin(Math.toRadians(value))));
+                    case "cos" -> area.setText(String.valueOf(Math.cos(Math.toRadians(value))));
+                    case "tan" -> area.setText(String.valueOf(Math.tan(Math.toRadians(value))));
+                    case "C" -> {
+                        currentInput.setLength(0);
+                        area.setText("0");
+                    }
+                    default -> {
+                        currentInput.append(command);
+                        area.setText(currentInput.toString());
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                area.setText("Invalid Input");
+            }
+        }
     }
 }
+
+
+
 
 class ProgrammerCalculator extends JFrame {
     public ProgrammerCalculator() {
