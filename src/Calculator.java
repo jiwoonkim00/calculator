@@ -202,6 +202,8 @@ public class Calculator extends JFrame {
 
 class ScientificCalculator extends JFrame {
     private JTextArea area;
+    private double result = 0;      // 멤버 변수로 선언
+    private String operator = "";
     private StringBuilder currentInput = new StringBuilder();
     private boolean newNumber = true;
 
@@ -300,6 +302,14 @@ class ScientificCalculator extends JFrame {
                             newNumber = true;
                         }
                     }
+                    case "+", "-", "x", "/" -> {
+                        if (!currentInput.isEmpty()) {
+                            result = Double.parseDouble(currentInput.toString());
+                            operator = command.equals("x") ? "*" : command;
+                            area.setText(result + " " + operator);
+                            currentInput.setLength(0);
+                        }
+                    }
                     case "C" -> {
                         currentInput.setLength(0);
                         area.setText("0");
@@ -317,9 +327,11 @@ class ScientificCalculator extends JFrame {
 
             } catch (NumberFormatException ex) {
                 area.setText("Error");
+                currentInput.setLength(0);
             }
         }
     }
+
 
     private String formatNumber(double number) {
         if (number == (long) number) {
