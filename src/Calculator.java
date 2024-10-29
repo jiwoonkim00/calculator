@@ -203,7 +203,7 @@ public class Calculator extends JFrame {
 class ScientificCalculator extends JFrame {
     private JTextArea area;
     private StringBuilder currentInput = new StringBuilder();
-    private double result = 0;
+    private boolean newNumber = true;
 
     public ScientificCalculator() {
         setTitle("공학용 계산기");
@@ -224,6 +224,7 @@ class ScientificCalculator extends JFrame {
         area.setEditable(false);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
+        area.setText("0");
 
         JScrollPane scrollPane = new JScrollPane(area);
         panel.add(scrollPane);
@@ -231,7 +232,9 @@ class ScientificCalculator extends JFrame {
         add(panel, BorderLayout.NORTH);
     }
     void showCenter() {
-        JPanel buttonPanel = new JPanel(new GridLayout(6, 4));
+        JPanel buttonPanel = new JPanel(new GridLayout(6, 4, 5, 5));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         String[] bottons = {
                 "C", "+/-", "%", "/",
                 "7", "8", "9", "x",
@@ -243,16 +246,18 @@ class ScientificCalculator extends JFrame {
 
         for (String text : bottons) {
             JButton button = new JButton(text);
-            button.addActionListener(new ButtonClikListener());
+            button.addActionListener(new ButtonClickListener());
             buttonPanel.add(button);
         }
 
         add(buttonPanel, BorderLayout.CENTER);
     }
+
     void showSouth() {
         JPanel comboPanel = new JPanel();
         String[] calculatorTypes = {"기본 계산기", "공학용 계산기", "프로그래머용 계산기"};
         JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
+        comboBox.setSelectedItem("공학용 계산기");
 
         comboBox.addActionListener(e -> {
             String selected = (String) comboBox.getSelectedItem();
@@ -273,63 +278,71 @@ class ScientificCalculator extends JFrame {
 
     }
 
+
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String command = e.getActionCommand();
 
             try {
-                double value = Double.parseDouble(currentInput.toString());
                 switch (command) {
-                    case "sin" -> area.setText(String.valueOf(Math.sin(Math.toRadians(value))));
-                    case "cos" -> area.setText(String.valueOf(Math.cos(Math.toRadians(value))));
-                    case "tan" -> area.setText(String.valueOf(Math.tan(Math.toRadians(value))));
+                    case "sin", "cos", "tan" -> {
+                        if (!currentInput.isEmpty()) {
+                            double value = Double.parseDouble(currentInput.toString());
+                            double result = switch (command) {
+                                case "sin" -> Math.sin(Math.toRadians(value));
+                                case "cos" -> Math.cos(Math.toRadians(value));
+                                case "tan" -> Math.tan(Math.toRadians(value));
+                                default -> 0;
+                            };
+                            currentInput.setLength(0);
+                            currentInput.append(formatNumber(result));
+                            area.setText(currentInput.toString());
+                            newNumber = true;
+                        }
+                    }
                     case "C" -> {
                         currentInput.setLength(0);
                         area.setText("0");
+                        newNumber = true;
                     }
                     default -> {
+                        if (newNumber) {
+                            currentInput.setLength(0);
+                            newNumber = false;
+                        }
                         currentInput.append(command);
                         area.setText(currentInput.toString());
                     }
                 }
+
             } catch (NumberFormatException ex) {
-                area.setText("Invalid Input");
+                area.setText("Error");
             }
+        }
+    }
+
+    private String formatNumber(double number) {
+        if (number == (long) number) {
+            return String.format("%d", (long) number);
+        }else{
+            return String.format("%.8g", number);
         }
     }
 }
 
 
-
-
 class ProgrammerCalculator extends JFrame {
+    private JTextArea area;
+    private StringBuilder currentInput = new StringBuilder();
+    private long result = 0;
+    private boolean newNumber = true;
+
     public ProgrammerCalculator() {
         setTitle("프로그래머용 계산기");
         setLayout(new BorderLayout());
 
-        JTextArea area = new JTextArea(4, 24);
-        area.setEditable(false);
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-
-        JScrollPane scrollPane = new JScrollPane(area);
-        add(scrollPane, BorderLayout.NORTH);
-
-        JPanel buttonPanel = new JPanel(new GridLayout(6, 4));
-        String[] buttons = {
-                "C", "+/-", "%", "/",
-                "7", "8", "9", "x",
-                "4", "5", "6", "-",
-                "1", "2", "3", "+",
-                "0", ".", "=",
-                "AND", "OR", "XOR", "NOT"
-        };
-
-        for (String text : buttons) {
-            buttonPanel.add(new JButton(text));
-        }
-
-        add(buttonPanel, BorderLayout.CENTER);
+        showNorth();
+        showCenter();
         showSouth();
 
         setSize(300, 400);
@@ -337,10 +350,46 @@ class ProgrammerCalculator extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    void showNorth() {
+        JPanel panel = new JPanel();
+        area = new JTextArea(4, 24);
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setText("0");
+
+        JScrollPane scrollPane = new JScrollPane(area);
+        panel.add(scrollPane);
+
+        add(panel, BorderLayout.NORTH);
+    }
+
+    void showCenter() {
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 4, 5, 5));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        String[] buttons = {
+                "C", "Hex", "Dec", "Bin",
+                "7", "8", "9", "AND",
+                "4", "5", "6", "OR",
+                "1", "2", "3", "XOR",
+                "0", ".", "=", "NOT"
+        };
+
+        for (String text : buttons) {
+            JButton button = new JButton(text);
+            button.addActionListener(new ButtonClickListener());
+            buttonPanel.add(button);
+        }
+
+        add(buttonPanel, BorderLayout.CENTER);
+    }
+
     void showSouth() {
         JPanel comboPanel = new JPanel();
         String[] calculatorTypes = {"기본 계산기", "공학용 계산기", "프로그래머용 계산기"};
         JComboBox<String> comboBox = new JComboBox<>(calculatorTypes);
+        comboBox.setSelectedItem("프로그래머용 계산기");
 
         comboBox.addActionListener(e -> {
             String selected = (String) comboBox.getSelectedItem();
@@ -358,5 +407,62 @@ class ProgrammerCalculator extends JFrame {
 
         comboPanel.add(comboBox);
         add(comboPanel, BorderLayout.SOUTH);
+    }
+
+    private class ButtonClickListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
+            try {
+                switch (command) {
+                    case "AND", "OR", "XOR", "NOT" -> {
+                        if (!currentInput.isEmpty()) {
+                            long value = Long.parseLong(currentInput.toString());
+                            result = switch (command) {
+                                case "AND" -> result & value;
+                                case "OR" -> result | value;
+                                case "XOR" -> result ^ value;
+                                case "NOT" -> ~value;
+                                default -> result;
+                            };
+                            currentInput.setLength(0);
+                            currentInput.append(result);
+                            area.setText(String.format("Decimal: %d\nHex: 0x%X\nBinary: %s",
+                                    result, result, Long.toBinaryString(result)));
+                            newNumber = true;
+                        }
+                    }
+                    case "Hex", "Dec", "Bin" -> {
+                        if (!currentInput.isEmpty()) {
+                            long value = Long.parseLong(currentInput.toString());
+                            area.setText(switch (command) {
+                                case "Hex" -> "0x" + Long.toHexString(value).toUpperCase();
+                                case "Bin" -> Long.toBinaryString(value);
+                                default -> String.valueOf(value);
+                            });
+                        }
+                    }
+                    case "C" -> {
+                        currentInput.setLength(0);
+                        result = 0;
+                        area.setText("0");
+                        newNumber = true;
+                    }
+                    default -> {
+                        if (newNumber) {
+                            currentInput.setLength(0);
+                            newNumber = false;
+                        }
+                        if (command.matches("[0-9]")) {
+                            currentInput.append(command);
+                            area.setText(currentInput.toString());
+                        }
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                area.setText("Error: Invalid Input");
+                currentInput.setLength(0);
+                newNumber = true;
+            }
+        }
     }
 }
