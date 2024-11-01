@@ -5,6 +5,6 @@
 프로그래머용 계산기에는 비트연산자 계산과 진법을 계산해주는 기능을 넣었습니다.
 계산기 기능 변경은 콤보박스를 이용하여 변경하게 하였습니다.
 
-https://github.com/jiwoonkim00/calculator/commits/main/
+[https://github.com/jiwoonkim00/calculator/commits/main/](https://github.com/jiwoonkim00/calculator.git)
 
 
